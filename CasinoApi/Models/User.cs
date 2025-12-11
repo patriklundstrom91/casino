@@ -1,12 +1,18 @@
+
 namespace CasinoApi;
 
 public class User
 {
-    public DateOnly Date { get; set; }
+    public string ClerkUserId { get; set; }
 
-    public int TemperatureC { get; set; }
+    public int UserName { get; set; }
 
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    public int Balance { get; set; }
 
-    public string? Summary { get; set; }
+    public DateTime CreatedAt { get; set; }
+
+    public DateTime LastLogIn { get; set; }
+
+    public ICollection<CasinoTransaction> CasinoTransactions { get; set; }
+    public ICollection<GameSession> GameSessions { get; set; }
 }
