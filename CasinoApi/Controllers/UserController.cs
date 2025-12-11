@@ -1,4 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace CasinoApi.Controllers;
 
@@ -6,20 +9,66 @@ namespace CasinoApi.Controllers;
 [Route("[controller]")]
 public class UserController : ControllerBase
 {
-    private static readonly string[] Summaries =
-    [
-        "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-    ];
-
-    [HttpGet(Name = "GetWeatherForecast")]
-    public IEnumerable<User> Get()
+    private readonly CasinoDbContext _context;
+    public UserController(CasinoDbContext context)
     {
-        return Enumerable.Range(1, 5).Select(index => new User
+        _context = context;
+    }
+    private string GetUserName(string? firstName, string? fullName, string? email)
+    {
+        return firstName ?? fullName ?? email?.Split("@")[0] ?? "player";
+    }
+
+    [HttpGet("{clerkUserId}")]
+    [Authorize]
+    public async Task<ActionResult<UserDto>> GetUser()
+    {
+        var clerkUserId = User.FindFirst("sub")?.Value;
+        var firstName = User.FindFirst("name")?.Value;
+        var fullName = User.FindFirst("fullname")?.Value;
+        var email = User.FindFirst("email")?.Value;
+
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.ClerkUserId == clerkUserId);
+
+        if (user == null)
         {
-            Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            TemperatureC = Random.Shared.Next(-20, 55),
-            Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-        })
-        .ToArray();
+            user = new User
+            {
+                ClerkUserId = clerkUserId!,
+                UserName = GetUserName(firstName, fullName, email)
+            };
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+        }
+
+        return new UserDto
+        {
+            GetUserName = user.UserName,
+            Balance = user.Balance,
+            TotalTransactions = await _context.CasinoTransactions.CountAsync(t => t.ClerkUserId == clerkUserId)
+        };
+    }
+
+    [HttpPost("balance/{clerkUserId}/{amount}")]
+    public async Task<ActionResult> UpdateBalance(decimal amount, [FromQuery] string gameType)
+    {
+        var clerkUserId = User.FindFirst("sub")?.Value;
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.ClerkUserId == clerkUserId);
+        if (user == null) return NotFound();
+        user.Balance += amount;
+        user.LastLogIn = DateTime.UtcNow;
+
+        var transaction = new CasinoTransaction
+        {
+            ClerkUserId = clerkUserId!,
+            Amount = amount,
+            Type = amount > 0 ? "win" : "loss",
+            GameType = gameType,
+            CreatedAt = DateTime.UtcNow
+        };
+        _context.CasinoTransactions.Add(transaction);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { balance = user.Balance });
     }
 }
