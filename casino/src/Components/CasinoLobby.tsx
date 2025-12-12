@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { UserButton, useUser } from "@clerk/clerk-react";
+import { toast } from "react-toastify";
 import {
   Coins,
   Sparkles,
@@ -54,7 +55,14 @@ export function CasinoLobby() {
   const navigate = useNavigate();
   const { user } = useUser();
   const userName =
-    user?.firstName || user?.primaryEmailAddress?.emailAddress.split("@")[0];
+    user?.firstName ||
+    user?.fullName ||
+    user?.primaryEmailAddress?.emailAddress.split("@")[0];
+
+    const handleClaimBonus = () => {
+      Update Balance =>
+        toast.success("Welcome Bonus Claimed! +")
+    }
 
   return (
     <div className="min-h-screen">
@@ -97,7 +105,7 @@ export function CasinoLobby() {
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2 px-2 py-2 bg-white/10 rounded-full border border-white/20 hover:shadow">
                   <Coins className="w-5 h-5 text-amber-400" />
-                  <span className="text-white">$10,000</span>
+                  <span>$10,000</span>
                 </div>
 
                 <div className="flex items-center gap-3">

@@ -12,11 +12,13 @@
   "dependencies": {
     "@clerk/clerk-react": "^5.58.1",
     "@tailwindcss/vite": "^4.1.17",
+    "@tanstack/react-query": "^5.90.12",
     "daisyui": "^5.5.11",
     "lucide-react": "^0.556.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.10.1",
+    "react-toastify": "^11.0.5",
     "tailwindcss": "^4.1.17"
   },
   "devDependencies": {
