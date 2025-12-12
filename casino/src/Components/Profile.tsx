@@ -12,56 +12,13 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-const games = [
-  {
-    id: "slots",
-    name: "Slots",
-    icon: Cherry,
-    path: "/slots",
-    color: "from-pink-500 to-rose-600",
-    bgColor: "bg-pink-500/20",
-    description: "Spin to win jackpots",
-  },
-  {
-    id: "blackjack",
-    name: "Blackjack",
-    icon: Spade,
-    path: "/blackjack",
-    color: "from-emerald-500 to-teal-600",
-    bgColor: "bg-emerald-500/20",
-    description: "Beat the dealer",
-  },
-  {
-    id: "roulette",
-    name: "Roulette",
-    icon: CircleDot,
-    path: "/roulette",
-    color: "from-red-500 to-orange-600",
-    bgColor: "bg-red-500/20",
-    description: "Place your bets",
-  },
-  {
-    id: "poker",
-    name: "Poker",
-    icon: Sparkles,
-    path: "/poker",
-    color: "from-blue-500 to-indigo-600",
-    bgColor: "bg-blue-500/20",
-    description: "High stakes action",
-  },
-];
-
-export function CasinoLobby() {
+export function Profile() {
   const navigate = useNavigate();
   const { user } = useUser();
   const userName =
     user?.firstName ||
     user?.fullName ||
     user?.primaryEmailAddress?.emailAddress.split("@")[0];
-
-  const handleClaimBonus = () => {
-    toast.success("Welcome Bonus Claimed! +");
-  };
 
   return (
     <div className="min-h-screen">
@@ -97,7 +54,7 @@ export function CasinoLobby() {
                 </div>
                 <div>
                   <h1>Casino</h1>
-                  <p>Game Lobby</p>
+                  <p>Profile</p>
                 </div>
               </div>
 
@@ -168,21 +125,6 @@ export function CasinoLobby() {
                 </button>
               );
             })}
-          </div>
-
-          {/* Promotional Banner */}
-          <div className="mt-12 bg-gradient-to-r from-amber-500/20 to-purple-500/20 backdrop-blur-md rounded-2xl border border-amber-500/30 p-8">
-            <div className="flex items-center justify-between flex-wrap gap-4">
-              <div>
-                <h3 className="text-white mb-2">🎁 Welcome Bonus</h3>
-                <p className="text-purple-200">
-                  Get 100% match on your first deposit up to $1,000!
-                </p>
-              </div>
-              <button className="px-8 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-lg shadow-lg shadow-amber-500/50 transition-all duration-300 hover:scale-105">
-                Claim Bonus
-              </button>
-            </div>
           </div>
         </main>
       </div>

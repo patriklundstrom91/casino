@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 import {
   BrowserRouter as Router,
@@ -14,8 +12,8 @@ import {
   RedirectToSignIn,
   SignIn,
 } from "@clerk/clerk-react";
-import { CasinoLobby } from "./Components/CasinoLobby";
-import { Dices } from "lucide-react";
+import { CasinoLobby } from "./components/CasinoLobby";
+import { Dices, Sparkles } from "lucide-react";
 
 function App() {
   return (
@@ -44,10 +42,15 @@ function App() {
                       <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full mb-4 shadow-xl shadow-amber-500/50">
                         <Dices className="w-10 h-10 text-white" />
                       </div>
-                      <h1 className="mb-2 flex items-center justify-center gap-2">
+                      <h1 className="mb-2 mt-2 flex items-center justify-center gap-2">
                         Welcome To Casino
                       </h1>
-                      <p>Where Legends Are Made</p>
+                      <h2 className="mb-3 py-4 flex items-center justify-center gap-3">
+                        <Sparkles className="w-8 h-8 text-amber-400" />
+                        Where Legends Are Made
+                        <Sparkles className="w-8 h-8 text-amber-400" />
+                      </h2>
+                      <p>Sign In To Enter The Casino</p>
                     </div>
                     <div className="flex items-center justify-center p-8">
                       <SignIn />
