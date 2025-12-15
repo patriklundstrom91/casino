@@ -3,7 +3,7 @@ name: Deploy React App to GitHub Pages
 on:
   push:
     branches: [main]
-    paths: ["casino/**"]
+    paths: ["casino/**"] # ✅ Bra för monorepo!
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -28,13 +28,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "npm"
-          cache-dependency-path: ./casino/package-lock.json
 
       - name: Install dependencies
-        run: npm ci
+        working-directory: ./casino # ← CD till casino mappen!
+        run: npm install # ← npm install istället för ci
 
       - name: Build React/Vite app
+        working-directory: ./casino # ← Build i casino!
         env:
           VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
           VITE_API_URL: ${{ vars.VITE_API_URL }}
@@ -46,7 +46,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "./casino/dist" # Vite output folder
+          path: "./casino/dist" # ✅ Rätt!
 
   deploy:
     environment:
