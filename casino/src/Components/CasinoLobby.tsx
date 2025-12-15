@@ -49,9 +49,9 @@ const games = [
 export function CasinoLobby() {
   const navigate = useNavigate();
   const apiFetch = useApi().apiFetch;
-  const { getToken, isSignedIn, isLoaded } = useAuth();
+  const { isSignedIn, isLoaded } = useAuth();
   const { user: clerkUser } = useUser();
-  const { user, isLoading, updateBalance, refetch } = useApiUser();
+  const { user, isLoading, refetch } = useApiUser();
   const userName =
     clerkUser?.firstName ||
     clerkUser?.fullName ||
@@ -70,8 +70,9 @@ export function CasinoLobby() {
       });
       toast.success(`Welcome Bonus Claimed! +$${data.balance}`);
       await refetch();
-    } catch (error: any) {
-      const errorMsg = error.message || "Failed to claim bonus";
+    } catch (error: unknown) {
+      const errorMsg =
+        error instanceof Error ? error.message : "Failed to claim bonus";
       toast.error(errorMsg);
     }
   };

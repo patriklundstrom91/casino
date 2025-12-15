@@ -61,8 +61,9 @@ export function SlotsGame() {
         } else {
           toast.error(`No win. -$${selectedBet}`);
         }
-      } catch (error: any) {
-        toast.error(error.message || "Spin failed");
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : "Spin failed";
+        toast.error(message);
       } finally {
         setIsSpinning(false);
       }
@@ -203,7 +204,7 @@ export function SlotsGame() {
             >
               {isSpinning
                 ? "🎰 SPINNING..."
-                : user?.balance < selectedBet
+                : user!.balance < selectedBet
                 ? `Need $${(selectedBet - (user?.balance || 0)).toFixed(
                     0
                   )} more`

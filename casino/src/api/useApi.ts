@@ -10,7 +10,6 @@ export const useApi = () => {
     async (endpoint: string, options: RequestInit = {}) => {
       const token = await getToken({ template: "Casino-JWT" });
       const url = `${API_URL}${endpoint.startsWith("/") ? "" : "/"}${endpoint}`;
-      console.log("🔑 TOKEN:", token ? "OK" : "NULL!");
       const response = await fetch(url, {
         ...options,
         headers: {
