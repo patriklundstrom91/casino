@@ -1,8 +1,11 @@
 
+using System.ComponentModel.DataAnnotations;
+
 namespace CasinoApi;
 
 public class CasinoTransaction
 {
+    [Key]
     public int Id { get; set; }
     public string ClerkUserId { get; set; } = string.Empty;
     public decimal Amount { get; set; }

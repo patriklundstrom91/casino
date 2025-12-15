@@ -3,6 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 public class CasinoDbContext : DbContext
 {
+    public CasinoDbContext(DbContextOptions<CasinoDbContext> options) : base(options)
+    {
+    }
     public DbSet<User> Users { get; set; }
     public DbSet<CasinoTransaction> CasinoTransactions { get; set; }
     public DbSet<GameSession> GameSessions { get; set; }

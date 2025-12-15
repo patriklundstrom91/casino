@@ -1,9 +1,11 @@
 using System.Text.Json;
 using CasinoApi;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 [ApiController]
-[Route("games/[action]")]
+[Route("games")]
 public class GamesController : ControllerBase
 {
     private readonly CasinoDbContext _context;
@@ -15,10 +17,13 @@ public class GamesController : ControllerBase
     }
 
     [HttpPost("slots/spin")]
+    [Authorize]
     public async Task<ActionResult<SlotsResult>> SpinSlots([FromBody] SlotsSpinRequest request)
     {
-        var user = await _context.Users.FirstAsync(u => u.ClerkUserId == request.ClerkUserId);
-
+        Console.WriteLine($"REQUEST: clerkUserId={request.ClerkUserId}, bet={request.Bet}");
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.ClerkUserId == request.ClerkUserId);
+        Console.WriteLine($"FOUND USER: {user?.ClerkUserId}");
+        if (user == null) return NotFound("Did not find user in database");
         if (user.Balance < request.Bet) return BadRequest("Insufficient balance");
 
         user.Balance -= request.Bet;
@@ -55,8 +60,9 @@ public class GamesController : ControllerBase
 
         return new SlotsResult
         {
+            ClerkUserId = user.ClerkUserId,
             Symbols = result,
-            winAmount = winAmount,
+            WinAmount = winAmount,
             NewBalance = user.Balance
         };
     }
