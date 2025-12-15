@@ -16,7 +16,7 @@ function App() {
     <Router basename="/casino">
       <Routes>
         <Route
-          path="/"
+          path="/casino"
           element={
             <>
               <SignedIn>
