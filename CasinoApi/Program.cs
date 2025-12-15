@@ -12,12 +12,16 @@ builder.Services.AddSwaggerGen();
 // CORS FÖRST
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("Development", policy =>
+    options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("http://localhost:5173")
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
+        policy.WithOrigins(
+            "https://patriklundstrom91.github.io",
+            "https://patriklundstrom91.github.io/casino",
+            "http://localhost:5173"
+        )
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials(); // För JWT cookies
     });
 });
 
@@ -56,7 +60,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors("Development");      // 1. CORS
+app.UseCors();      // 1. CORS
 app.UseAuthentication();         // 2. AUTHENTICATION 
 app.UseAuthorization();          // 3. AUTHORIZATION
 app.MapControllers();            // 4. CONTROLLERS SIST!
