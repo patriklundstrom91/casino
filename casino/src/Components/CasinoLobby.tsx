@@ -1,19 +1,10 @@
 import { useNavigate } from "react-router-dom";
-import { useAuth, UserButton, useUser } from "@clerk/clerk-react";
+import { useAuth, useUser } from "@clerk/clerk-react";
 import { toast } from "react-toastify";
 import { useApi } from "../api/useApi";
-import {
-  Coins,
-  Sparkles,
-  CircleDot,
-  Spade,
-  Cherry,
-  User,
-  Dices,
-} from "lucide-react";
-import { useEffect, useState } from "react";
+import { Coins, Sparkles, CircleDot, Spade, Cherry, Dices } from "lucide-react";
+import { useEffect } from "react";
 import CustomUserButton from "./CustomUserButton";
-import { useQuery } from "@tanstack/react-query";
 import { useApiUser } from "../api/useApiUser";
 
 const games = [
@@ -71,10 +62,6 @@ export function CasinoLobby() {
       refetch();
     }
   }, [isSignedIn, isLoaded, refetch]);
-
-  const handleGameClick = (gameType: string) => {
-    toast.success(`Loading ${gameType}...`);
-  };
 
   const handleClaimBonus = async () => {
     try {

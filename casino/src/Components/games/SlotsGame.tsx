@@ -1,17 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { useApi } from "../../api/useApi";
-import { UserButton, useUser } from "@clerk/clerk-react";
+import { useUser } from "@clerk/clerk-react";
 import { toast } from "react-toastify";
 import { Coins, ChevronLeft, Dices } from "lucide-react";
 import { useState } from "react";
-import CustomUserButton from "../CustomUserButton";
 import { useApiUser } from "../../api/useApiUser";
-
-interface SlotsResult {
-  symbols: string[];
-  winAmount: number;
-  newBalance: number;
-}
+import CustomUserButton from "../CustomUserButton";
 
 export function SlotsGame() {
   const navigate = useNavigate();
@@ -36,7 +30,7 @@ export function SlotsGame() {
     }
 
     setIsSpinning(true);
-    toast.loading("Spinning...", { duration: 2500 });
+    toast.loading("Spinning...");
 
     const animationInterval = setInterval(() => {
       setReels((prev) =>
@@ -133,7 +127,11 @@ export function SlotsGame() {
                     ${user?.balance?.toFixed(2) || "0.00"}
                   </span>
                 </div>
-                <UserButton afterSignOutUrl="/" />
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 px-2 py-2 bg-white/10 rounded-full border border-white/20">
+                    <CustomUserButton />
+                  </div>
+                </div>
               </div>
             </div>
           </div>

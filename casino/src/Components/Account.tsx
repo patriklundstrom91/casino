@@ -1,15 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { UserButton, useUser } from "@clerk/clerk-react";
-import { toast } from "react-toastify";
-import {
-  Coins,
-  Sparkles,
-  CircleDot,
-  Spade,
-  Cherry,
-  User,
-  Dices,
-} from "lucide-react";
+import { useUser } from "@clerk/clerk-react";
+import { Coins, Dices } from "lucide-react";
 import { useEffect, useState } from "react";
 import CustomUserButton from "./CustomUserButton";
 import { useApi } from "../api/useApi";
@@ -164,7 +155,7 @@ export function Account() {
                           <th className="p-3 sm:p-4 text-right font-semibold text-white/90 hidden md:table-cell">
                             Win
                           </th>
-                          <th className="p-3 sm:p-4 text-right font-semibold text-white/90 hidden lg:table-cell">
+                          <th className="p-3 sm:p-4 text-right font-semibold text-white/90 lg:table-cell">
                             Net
                           </th>
                           <th className="p-3 sm:p-4 text-right font-semibold text-white/90">
@@ -194,7 +185,7 @@ export function Account() {
                               ${session.winAmount.toFixed(2)}
                             </td>
                             <td
-                              className={`p-3 sm:p-4 text-right font-mono font-bold hidden lg:table-cell ${
+                              className={`p-3 sm:p-4 text-right font-mono font-bold lg:table-cell ${
                                 session.netProfit >= 0
                                   ? "text-green-400"
                                   : "text-red-400"
