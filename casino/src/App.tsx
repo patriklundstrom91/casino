@@ -16,7 +16,7 @@ function App() {
     <Router basename="/casino">
       <Routes>
         <Route
-          path="/"
+          path="/casino"
           element={
             <>
               <SignedIn>
@@ -33,7 +33,6 @@ function App() {
                   </div>
 
                   <div className="relative w-full max-w-md">
-                    {/* Logo and Title */}
                     <div className="text-center mb-8">
                       <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full mb-4 shadow-xl shadow-amber-500/50">
                         <Dices className="w-10 h-10 text-white" />
