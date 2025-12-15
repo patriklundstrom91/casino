@@ -44,7 +44,8 @@ public class UserController : ControllerBase
         {
             UserName = user.UserName,
             Balance = user.Balance,
-            TotalTransactions = await _context.CasinoTransactions.CountAsync(t => t.ClerkUserId == clerkUserId)
+            TotalTransactions = await _context.CasinoTransactions.CountAsync(t => t.ClerkUserId == clerkUserId),
+            HasClaimedWelcomeBonus = user.HasClaimedWelcomeBonus
         };
     }
 

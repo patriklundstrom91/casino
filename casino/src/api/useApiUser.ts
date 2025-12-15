@@ -6,6 +6,7 @@ interface UserDto {
   userName: string;
   balance: number;
   totalTransactions: number;
+  hasClaimedWelcomeBonus: boolean;
 }
 
 interface UpdateBalanceDto {
@@ -21,7 +22,8 @@ export function useApiUser() {
     queryFn: async () => {
       const token = await getToken({ template: "Casino-JWT" });
       console.log("token ?=?)?=", token);
-      const res = await fetch("http://localhost:5136/user", {
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5136";
+      const res = await fetch(`${API_URL}/user`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       console.log("🌐 Fetching /user, status:", res.status);

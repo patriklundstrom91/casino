@@ -164,7 +164,6 @@ export function CasinoLobby() {
             </h2>
           </div>
 
-          {/* Games Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {games.map((game) => {
               const Icon = game.icon;
@@ -198,7 +197,11 @@ export function CasinoLobby() {
             })}
           </div>
 
-          <div className="mt-12 bg-gradient-to-r from-amber-500/20 to-purple-500/20 backdrop-blur-md rounded-2xl border border-amber-500/30 p-8">
+          <div
+            className={`mt-12 bg-gradient-to-r from-amber-500/20 to-purple-500/20 backdrop-blur-md rounded-2xl border border-amber-500/30 p-8 ${
+              user?.hasClaimedWelcomeBonus ? "hidden" : "block"
+            }`}
+          >
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div>
                 <h3 className="text-white mb-2">🎁 Welcome Bonus</h3>

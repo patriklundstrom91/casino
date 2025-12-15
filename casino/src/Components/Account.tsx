@@ -244,12 +244,12 @@ export function Account() {
                         <div className="flex items-center gap-3 flex-1 min-w-0">
                           <div
                             className={`w-10 h-10 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 ${
-                              transaction.type === "deposit"
+                              transaction.type === "Deposit"
                                 ? "bg-green-500/20 text-green-400 border-2 border-green-500/30"
                                 : "bg-red-500/20 text-red-400 border-2 border-red-500/30"
                             }`}
                           >
-                            {transaction.type === "deposit" ? "↑" : "↓"}
+                            {transaction.type === "Deposit" ? "↑" : "↓"}
                           </div>
                           <div className="min-w-0">
                             <p className="font-semibold text-white truncate text-sm">
@@ -263,7 +263,7 @@ export function Account() {
                         <div className="text-right shrink-0">
                           <p
                             className={`text-xl sm:text-2xl font-black ${
-                              transaction.type === "deposit"
+                              transaction.type === "Deposit"
                                 ? "text-green-400"
                                 : "text-red-400"
                             }`}
