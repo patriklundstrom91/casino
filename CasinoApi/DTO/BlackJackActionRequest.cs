@@ -1,0 +1,1 @@
+public class BlackjackActionRequest { public string ClerkUserId { get; set; } }

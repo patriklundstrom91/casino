@@ -31,23 +31,13 @@ builder.Services.AddDbContext<CasinoDbContext>(options =>
 
 // JWT SIST bland services
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.Authority = "https://model-serval-37.clerk.accounts.dev";
+    .AddJwtBearer("Casino-JWT", options =>
+{
+    options.Authority = "https://model-servant-37.clerk.accounts.dev";  // ← BYT denna!
+    options.Audience = "casino-api";
+    options.RequireHttpsMetadata = false;  // Azure
+});
 
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidIssuer = "https://model-serval-37.clerk.accounts.dev",
-
-            ValidateAudience = true,
-            ValidAudience = "casino-api",
-
-            ValidateLifetime = true
-        };
-
-        options.MapInboundClaims = false;
-    });
 
 builder.Services.AddAuthorization();
 
