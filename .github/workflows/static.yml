@@ -30,11 +30,11 @@ jobs:
           node-version: "20"
 
       - name: Install dependencies
-        working-directory: ./casino # ← CD till casino mappen!
-        run: npm install # ← npm install istället för ci
+        working-directory: ./casino
+        run: npm install
 
       - name: Build React/Vite app
-        working-directory: ./casino # ← Build i casino!
+        working-directory: ./casino
         env:
           VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
           VITE_API_URL: ${{ vars.VITE_API_URL }}
