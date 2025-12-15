@@ -33,7 +33,7 @@ createRoot(document.getElementById("root")!).render(
       pauseOnHover
       theme="dark"
     />
-    <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+    <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/casino/">
       <QueryClientProvider client={queryClient}>
         <App />
       </QueryClientProvider>
