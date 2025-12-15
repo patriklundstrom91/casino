@@ -16,7 +16,7 @@ function App() {
     <Router basename="/casino">
       <Routes>
         <Route
-          path="/casino"
+          path="/"
           element={
             <>
               <SignedIn>
@@ -82,7 +82,7 @@ function App() {
           path="*"
           element={
             <SignedOut>
-              <RedirectToSignIn />
+              <RedirectToSignIn signInFallbackRedirectUrl="/casino" />
             </SignedOut>
           }
         />
