@@ -22,20 +22,20 @@ const queryClient = new QueryClient({
 });
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
+    <ToastContainer
+      position="top-right"
+      autoClose={3000}
+      hideProgressBar={false}
+      newestOnTop
+      closeOnClick
+      pauseOnFocusLoss
+      draggable
+      pauseOnHover
+      theme="dark"
+    />
     <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
       <QueryClientProvider client={queryClient}>
         <App />
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop
-          closeOnClick
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="dark"
-        />
       </QueryClientProvider>
     </ClerkProvider>
   </StrictMode>

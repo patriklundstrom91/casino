@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
-import { UserButton, useUser } from "@clerk/clerk-react";
+import { useAuth, UserButton, useUser } from "@clerk/clerk-react";
 import { toast } from "react-toastify";
+import { useApi } from "../api/useApi";
 import {
   Coins,
   Sparkles,
@@ -10,7 +11,10 @@ import {
   User,
   Dices,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import CustomUserButton from "./CustomUserButton";
+import { useQuery } from "@tanstack/react-query";
+import { useApiUser } from "../api/useApiUser";
 
 const games = [
   {
@@ -53,16 +57,45 @@ const games = [
 
 export function CasinoLobby() {
   const navigate = useNavigate();
-  const { user } = useUser();
+  const apiFetch = useApi().apiFetch;
+  const { getToken, isSignedIn, isLoaded } = useAuth();
+  const { user: clerkUser } = useUser();
+  const { user, isLoading, updateBalance, refetch } = useApiUser();
   const userName =
-    user?.firstName ||
-    user?.fullName ||
-    user?.primaryEmailAddress?.emailAddress.split("@")[0];
+    clerkUser?.firstName ||
+    clerkUser?.fullName ||
+    clerkUser?.primaryEmailAddress?.emailAddress.split("@")[0];
 
-  const handleClaimBonus = () => {
-    toast.success("Welcome Bonus Claimed! +");
+  useEffect(() => {
+    if (isSignedIn && isLoaded) {
+      refetch();
+    }
+  }, [isSignedIn, isLoaded, refetch]);
+
+  const handleGameClick = (gameType: string) => {
+    toast.success(`Loading ${gameType}...`);
   };
 
+  const handleClaimBonus = async () => {
+    try {
+      const data = await apiFetch("/user/claim-bonus", {
+        method: "POST",
+      });
+      toast.success(`Welcome Bonus Claimed! +$${data.balance}`);
+      await refetch();
+    } catch (error: any) {
+      const errorMsg = error.message || "Failed to claim bonus";
+      toast.error(errorMsg);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <span className="loading loading-ring loading-xl"></span>
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen">
       <div className="absolute inset-0 overflow-hidden">
@@ -79,7 +112,6 @@ export function CasinoLobby() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="hover-3d">
-                  {/* content */}
                   <figure className="max-w-100 rounded-2xl">
                     <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center shadow-lg shadow-amber-500/50">
                       <Dices className="w-6 h-6 text-white" />
@@ -104,12 +136,12 @@ export function CasinoLobby() {
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2 px-2 py-2 bg-white/10 rounded-full border border-white/20 hover:shadow">
                   <Coins className="w-5 h-5 text-amber-400" />
-                  <span>$10,000</span>
+                  <span>${user?.balance.toFixed(2) || "0.00"}</span>
                 </div>
 
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-2 px-2 py-2 bg-white/10 rounded-full border border-white/20">
-                    <UserButton />
+                    <CustomUserButton />
                   </div>
                 </div>
               </div>
@@ -142,12 +174,9 @@ export function CasinoLobby() {
                   onClick={() => navigate(game.path)}
                   className="group relative overflow-hidden bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-8 hover:scale-105 transition-all duration-300 hover:shadow-2xl hover:border-white/40"
                 >
-                  {/* Background gradient on hover */}
                   <div
                     className={`absolute inset-0 bg-gradient-to-br ${game.color} opacity-0 group-hover:opacity-20 transition-opacity`}
                   />
-
-                  {/* Icon background */}
                   <div
                     className={`w-20 h-20 ${game.bgColor} rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform`}
                   >
@@ -157,7 +186,6 @@ export function CasinoLobby() {
                   <h3 className="text-white mb-2">{game.name}</h3>
                   <p className="text-purple-200">{game.description}</p>
 
-                  {/* Play button on hover */}
                   <div className="mt-4 transition-opacity">
                     <span
                       className={`inline-block px-6 py-2 bg-gradient-to-r ${game.color} text-white rounded-lg shadow-lg`}
@@ -170,7 +198,6 @@ export function CasinoLobby() {
             })}
           </div>
 
-          {/* Promotional Banner */}
           <div className="mt-12 bg-gradient-to-r from-amber-500/20 to-purple-500/20 backdrop-blur-md rounded-2xl border border-amber-500/30 p-8">
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div>
@@ -179,7 +206,10 @@ export function CasinoLobby() {
                   Get 100% match on your first deposit up to $1,000!
                 </p>
               </div>
-              <button className="px-8 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-lg shadow-lg shadow-amber-500/50 transition-all duration-300 hover:scale-105">
+              <button
+                onClick={handleClaimBonus}
+                className="px-8 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-lg shadow-lg shadow-amber-500/50 transition-all duration-300 hover:scale-105"
+              >
                 Claim Bonus
               </button>
             </div>
