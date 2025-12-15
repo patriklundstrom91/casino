@@ -3,6 +3,7 @@ name: Deploy React App to GitHub Pages
 on:
   push:
     branches: [main]
+    paths: ["casino/**"]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -28,7 +29,7 @@ jobs:
         with:
           node-version: "20"
           cache: "npm"
-          cache-dependency-path: package-lock.json
+          cache-dependency-path: ./casino/package-lock.json
 
       - name: Install dependencies
         run: npm ci
@@ -45,7 +46,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "./dist" # Vite output folder
+          path: "./casino/dist" # Vite output folder
 
   deploy:
     environment:
