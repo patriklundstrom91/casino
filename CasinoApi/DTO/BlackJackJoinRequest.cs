@@ -1,1 +1,0 @@
-public class BlackjackJoinRequest { public string ClerkUserId { get; set; } public decimal Bet { get; set; } }
