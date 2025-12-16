@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,17 +24,17 @@ builder.Services.AddCors(options =>
     });
 });
 
-// DbContext
+
 builder.Services.AddDbContext<CasinoDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// JWT SIST bland services
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer("Casino-JWT", options =>
 {
-    options.Authority = "https://model-servant-37.clerk.accounts.dev";  // ← BYT denna!
+    options.Authority = "https://model-servant-37.clerk.accounts.dev";
     options.Audience = "casino-api";
-    options.RequireHttpsMetadata = false;  // Azure
+    options.RequireHttpsMetadata = false;
 });
 
 
