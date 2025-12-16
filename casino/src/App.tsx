@@ -10,7 +10,6 @@ import { CasinoLobby } from "./components/CasinoLobby";
 import { Dices, Sparkles } from "lucide-react";
 import { SlotsGame } from "./components/games/SlotsGame";
 import { Account } from "./components/Account";
-import { BlackjackGame } from "./components/games/BlackJackGame";
 
 function App() {
   return (
@@ -68,16 +67,6 @@ function App() {
             </SignedIn>
           }
         />
-        <Route
-          path="/blackjack"
-          element={
-            <SignedIn>
-              <BlackjackGame />
-            </SignedIn>
-          }
-        />
-        <Route path="/roulette" element={<SignedIn></SignedIn>} />
-        <Route path="/poker" element={<SignedIn></SignedIn>} />
         <Route
           path="/account"
           element={
