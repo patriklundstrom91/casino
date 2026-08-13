@@ -79,7 +79,7 @@ function App() {
           path="*"
           element={
             <SignedOut>
-              <RedirectToSignIn signInFallbackRedirectUrl="/casino" />
+              <RedirectToSignIn signInFallbackRedirectUrl="/casino/" />
             </SignedOut>
           }
         />
