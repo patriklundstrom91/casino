@@ -8,6 +8,7 @@ export default defineConfig({
   base: "/casino/",
   build: {
     outDir: "dist",
+    assetsDir: "assets",
   },
 });
 

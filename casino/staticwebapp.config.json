@@ -1,7 +1,6 @@
 {
   "navigationFallback": {
     "rewrite": "/casino/index.html",
-    "exclude": ["/api/*"]
+    "exclude": ["/casino/assets/*", "/api/*"]
   }
 }
-
