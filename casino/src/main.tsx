@@ -37,9 +37,6 @@ createRoot(document.getElementById("root")!).render(
       publishableKey={PUBLISHABLE_KEY}
       signInUrl="/casino/sign-in"
       signUpUrl="/casino/sign-up"
-      afterSignInUrl="/casino/"
-      afterSignUpUrl="/casino/"
-      signOutUrl="/casino/"
       afterSignOutUrl="/casino/"
     >
       <QueryClientProvider client={queryClient}>

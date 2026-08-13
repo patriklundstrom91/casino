@@ -58,6 +58,12 @@ export function CasinoLobby() {
     clerkUser?.primaryEmailAddress?.emailAddress.split("@")[0];
 
   useEffect(() => {
+    if (isLoaded && !isSignedIn) {
+      navigate("/");
+    }
+  }, [isLoaded, isSignedIn, navigate]);
+
+  useEffect(() => {
     if (isSignedIn && isLoaded) {
       refetch();
     }

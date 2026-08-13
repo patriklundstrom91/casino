@@ -2,60 +2,56 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
 namespace CasinoApi.Migrations
 {
     [DbContext(typeof(CasinoDbContext))]
-    [Migration("20251215143255_updatedmodels")]
-    partial class updatedmodels
+    [Migration("20260812135440_InitialPostgres")]
+    partial class InitialPostgres
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.1")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+                .HasAnnotation("ProductVersion", "10.0.4")
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "uuid-ossp");
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("CasinoApi.CasinoTransaction", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("numeric");
 
                     b.Property<string>("ClerkUserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamptz");
 
                     b.Property<string>("GameType")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserClerkUserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserClerkUserId");
 
                     b.HasIndex("ClerkUserId", "CreatedAt");
 
@@ -66,37 +62,34 @@ namespace CasinoApi.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("BetAmount")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("numeric");
 
                     b.Property<string>("ClerkUserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("GameType")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("PlayedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamptz");
 
                     b.Property<string>("Result")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserClerkUserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<decimal>("WinAmount")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("numeric");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserClerkUserId");
+                    b.HasIndex("ClerkUserId");
 
                     b.ToTable("GameSessions");
                 });
@@ -104,23 +97,23 @@ namespace CasinoApi.Migrations
             modelBuilder.Entity("CasinoApi.User", b =>
                 {
                     b.Property<string>("ClerkUserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<decimal>("Balance")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("numeric");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamptz");
 
                     b.Property<bool>("HasClaimedWelcomeBonus")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<DateTime>("LastLogIn")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamptz");
 
                     b.Property<string>("UserName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.HasKey("ClerkUserId");
 
@@ -130,18 +123,55 @@ namespace CasinoApi.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("SlotsResult", b =>
+                {
+                    b.Property<string>("ClerkUserId")
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("NewBalance")
+                        .HasColumnType("numeric");
+
+                    b.PrimitiveCollection<string>("Symbols")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<decimal>("WinAmount")
+                        .HasColumnType("numeric");
+
+                    b.HasKey("ClerkUserId");
+
+                    b.ToTable("SlotsResults");
+                });
+
+            modelBuilder.Entity("SlotsSpinRequest", b =>
+                {
+                    b.Property<string>("ClerkUserId")
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("Bet")
+                        .HasColumnType("numeric");
+
+                    b.HasKey("ClerkUserId");
+
+                    b.ToTable("SlotsSpinRequests");
+                });
+
             modelBuilder.Entity("CasinoApi.CasinoTransaction", b =>
                 {
                     b.HasOne("CasinoApi.User", null)
                         .WithMany("CasinoTransactions")
-                        .HasForeignKey("UserClerkUserId");
+                        .HasForeignKey("ClerkUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("CasinoApi.GameSession", b =>
                 {
                     b.HasOne("CasinoApi.User", null)
                         .WithMany("GameSessions")
-                        .HasForeignKey("UserClerkUserId");
+                        .HasForeignKey("ClerkUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("CasinoApi.User", b =>
