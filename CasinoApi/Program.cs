@@ -18,7 +18,7 @@ builder.Services.AddCors(options =>
         policy.WithOrigins(
             "https://patriklundstrom91.github.io",
             "https://patriklundstrom91.github.io/casino",
-            "https://green-hill-07216a003.7.azurestaticapps.net",
+            "https://proud-forest-083b0be03.7.azurestaticapps.net",
             "http://localhost:5173"
         )
         .AllowAnyMethod()
