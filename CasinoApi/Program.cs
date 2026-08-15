@@ -5,32 +5,26 @@ using Npgsql.EntityFrameworkCore.PostgreSQL;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Services (INORDNING!)
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// CORS FÖRST
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
         policy.WithOrigins(
-            "https://patriklundstrom91.github.io",
-            "https://patriklundstrom91.github.io/casino",
             "https://proud-forest-083b0be03.7.azurestaticapps.net",
             "http://localhost:5173"
         )
-        .AllowAnyMethod()
         .AllowAnyHeader()
-        .AllowCredentials(); // För JWT cookies
+        .AllowAnyMethod()
+        .AllowCredentials();
     });
 });
 
-
 builder.Services.AddDbContext<CasinoDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -51,21 +45,29 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.MapInboundClaims = false;
     });
 
-
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// MIDDLEWARE ORDNING (KRITISK!)
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseCors();      // 1. CORS
-app.UseAuthentication();         // 2. AUTHENTICATION 
-app.UseAuthorization();          // 3. AUTHORIZATION
-app.MapControllers();            // 4. CONTROLLERS SIST!
+app.UseRouting();
+
+// ⭐ FÅNGA ALLA OPTIONS
+app.MapMethods("{*path}", new[] { "OPTIONS" }, () => Results.Ok());
+
+// ⭐ CORS MÅSTE LIGGA EFTER ROUTING
+app.UseCors();
+
+// ⭐ AUTH
+app.UseAuthentication();
+app.UseAuthorization();
+
+// ⭐ CONTROLLERS
+app.MapControllers();
 
 app.Run();
