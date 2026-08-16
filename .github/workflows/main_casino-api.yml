@@ -1,51 +1,40 @@
-name: Build and deploy ASP.NET Core API to Azure Web App - casino-api
+name: Deploy Casino Backend to Azure App Service
 
 on:
   push:
-    paths:
-      - "CasinoApi/**"
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
   build:
     runs-on: windows-latest
-    permissions:
-      contents: read
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '10.x'
+          dotnet-version: 8.0.x
 
       - name: Restore
-        working-directory: ./CasinoApi
         run: dotnet restore
 
       - name: Build
-        working-directory: ./CasinoApi
         run: dotnet build --configuration Release --no-restore
 
       - name: Publish
-        working-directory: ./CasinoApi
         run: dotnet publish -c Release -o ./publish
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: api-publish
-          path: ./CasinoApi/publish
+          path: ./publish
 
   deploy:
     runs-on: windows-latest
     needs: build
-    permissions:
-      id-token: write
-      contents: read
 
     steps:
       - name: Download artifact
@@ -54,16 +43,9 @@ jobs:
           name: api-publish
           path: ./publish
 
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID }}
-
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'casino-api'
-          slot-name: 'Production'
+          app-name: "casino-api"
+          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
           package: ./publish
