@@ -1,2 +1,5 @@
 # casino
-[OPEN REACT CASINO](https://patriklundstrom91.github.io/casino/)
+
+Casino project made WIth C# .NET and React.
+
+[OPEN REACT CASINO](https://proud-forest-083b0be03.7.azurestaticapps.net/)
