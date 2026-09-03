@@ -47,7 +47,7 @@ public class PaymentsController : ControllerBase
                 {
                     PriceData = new SessionLineItemPriceDataOptions
                     {
-                        Currency = "sek",
+                        Currency = "USD",
                         UnitAmount = request.Amount * 100,
                         ProductData = new SessionLineItemPriceDataProductDataOptions
                         {
@@ -75,14 +75,8 @@ public class PaymentsController : ControllerBase
     public async Task<IActionResult> StripeWebhook()
     {
         var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
-        var signature = Request.Headers["Stripe-Signature"].ToString();
+        var signature = Request.Headers["Stripe-Signature"];
         var secret = _config["Stripe:WebhookSecret"];
-
-        _logger.LogInformation("=== STRIPE DEBUG START ===");
-        _logger.LogInformation("RAW PAYLOAD: {Payload}", json);
-        _logger.LogInformation("SIGNATURE HEADER: {Signature}", signature);
-        _logger.LogInformation("AZURE SECRET: {Secret}", secret);
-        _logger.LogInformation("=== STRIPE DEBUG END ===");
 
         Event stripeEvent;
 
