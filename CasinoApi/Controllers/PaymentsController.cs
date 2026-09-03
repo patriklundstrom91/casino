@@ -81,7 +81,7 @@ public class PaymentsController : ControllerBase
         // === FILE LOGGING (WORKS ON FREE PLAN) ===
         try
         {
-            var logPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "stripe-log.txt");
+            var logPath = Path.Combine("D:\\home\\LogFiles", "stripe-log.txt");
 
             var logText = $@"
 ===========================
@@ -102,7 +102,6 @@ Secret:
         }
         catch (Exception fileEx)
         {
-            // If file logging fails, at least return something
             return BadRequest("File logging failed: " + fileEx.Message);
         }
 
@@ -115,9 +114,10 @@ Secret:
         }
         catch (Exception ex)
         {
-            // Log signature failure to file also
-            var logPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "stripe-log.txt");
-            System.IO.File.AppendAllText(logPath, $"\nSignature validation failed:\n{ex}\n");
+            System.IO.File.AppendAllText(
+                Path.Combine("D:\\home\\LogFiles", "stripe-log.txt"),
+                $"\nSignature validation failed:\n{ex}\n"
+            );
 
             return BadRequest("Invalid Stripe signature");
         }
@@ -129,7 +129,7 @@ Secret:
             if (session == null)
             {
                 System.IO.File.AppendAllText(
-                    Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "stripe-log.txt"),
+                    Path.Combine("D:\\home\\LogFiles", "stripe-log.txt"),
                     "\nSession object was null\n"
                 );
                 return Ok();
@@ -142,7 +142,7 @@ Secret:
             if (user == null)
             {
                 System.IO.File.AppendAllText(
-                    Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "stripe-log.txt"),
+                    Path.Combine("D:\\home\\LogFiles", "stripe-log.txt"),
                     $"\nUser not found: {userId}\n"
                 );
                 return Ok();
@@ -162,7 +162,7 @@ Secret:
             await _db.SaveChangesAsync();
 
             System.IO.File.AppendAllText(
-                Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "stripe-log.txt"),
+                Path.Combine("D:\\home\\LogFiles", "stripe-log.txt"),
                 $"\nDeposit completed for {userId}, amount {amount}\n"
             );
         }
