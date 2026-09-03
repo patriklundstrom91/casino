@@ -172,7 +172,7 @@ Secret:
 
 
     // ---------------------------------------------------------
-    // 3. Withdraw
+    // 3. Withdraw.
     // ---------------------------------------------------------
     [HttpPost("withdraw")]
     public async Task<IActionResult> Withdraw([FromBody] WithdrawRequest request)
