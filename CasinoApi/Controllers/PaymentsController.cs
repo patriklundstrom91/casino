@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Stripe;
 using Stripe.Checkout;
 using System.Security.Claims;
@@ -14,11 +15,16 @@ public class PaymentsController : ControllerBase
 {
     private readonly CasinoDbContext _db;
     private readonly IConfiguration _config;
+    private readonly ILogger<PaymentsController> _logger;
 
-    public PaymentsController(CasinoDbContext db, IConfiguration config)
+    public PaymentsController(
+        CasinoDbContext db,
+        IConfiguration config,
+        ILogger<PaymentsController> logger)
     {
         _db = db;
         _config = config;
+        _logger = logger;
     }
 
     // ---------------------------------------------------------
@@ -70,30 +76,29 @@ public class PaymentsController : ControllerBase
     public async Task<IActionResult> StripeWebhook()
     {
         var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
-        var signature = Request.Headers["Stripe-Signature"];
+        var signature = Request.Headers["Stripe-Signature"].ToString();
         var secret = _config["Stripe:WebhookSecret"];
-        Console.WriteLine("=== STRIPE DEBUG START ===");
-        Console.WriteLine("RAW PAYLOAD:");
-        Console.WriteLine(json);
-        Console.WriteLine("--------------------------");
-        Console.WriteLine("SIGNATURE HEADER:");
-        Console.WriteLine(signature);
-        Console.WriteLine("--------------------------");
-        Console.WriteLine("AZURE SECRET:");
-        Console.WriteLine(secret);
-        Console.WriteLine("=== STRIPE DEBUG END ===");
+
+        // ⭐ Azure App Service visar INTE Console.WriteLine → ILogger krävs
+        _logger.LogInformation("=== STRIPE DEBUG START ===");
+        _logger.LogInformation("RAW PAYLOAD: {Payload}", json);
+        _logger.LogInformation("SIGNATURE HEADER: {Signature}", signature);
+        _logger.LogInformation("AZURE SECRET: {Secret}", secret);
+        _logger.LogInformation("=== STRIPE DEBUG END ===");
+
         Event stripeEvent;
 
         try
         {
             stripeEvent = EventUtility.ConstructEvent(json, signature, secret);
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Stripe signature validation failed");
             return BadRequest("Invalid Stripe signature");
         }
 
-        if (stripeEvent.Type == "checkout.session.completed")
+        if (stripeEvent.Type == Events.CheckoutSessionCompleted)
         {
             var session = stripeEvent.Data.Object as Session;
 
@@ -102,7 +107,10 @@ public class PaymentsController : ControllerBase
 
             var user = await _db.Users.FirstOrDefaultAsync(u => u.ClerkUserId == userId);
             if (user == null)
-                return Ok(); // användaren finns inte → ignorera webhook
+            {
+                _logger.LogWarning("Webhook received for non-existing user: {UserId}", userId);
+                return Ok();
+            }
 
             user.Balance += amount;
 
@@ -116,6 +124,8 @@ public class PaymentsController : ControllerBase
             });
 
             await _db.SaveChangesAsync();
+
+            _logger.LogInformation("Deposit completed for user {UserId}, amount {Amount}", userId, amount);
         }
 
         return Ok();

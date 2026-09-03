@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Npgsql.EntityFrameworkCore.PostgreSQL;
 using Stripe;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -64,19 +63,20 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Routing först
 app.UseRouting();
 
-// CORS — Stripe kräver att CORS ligger efter routing
+// CORS direkt efter routing
 app.UseCors();
 
-// Auth — Clerk får inte läsa webhook-body före routing
+// Auth efter CORS
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Controllers — MVC ska hantera webhooken
+// Controllers
 app.MapControllers();
 
-// OPTIONS wildcard — läggs sist så den inte stör webhooken
+// OPTIONS wildcard sist (för Azure Static Web Apps)
 app.MapMethods("{*path}", new[] { "OPTIONS" }, () => Results.Ok());
 
 app.Run();
