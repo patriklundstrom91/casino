@@ -64,20 +64,19 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// Routing måste komma innan CORS + Auth
 app.UseRouting();
 
-// Fånga OPTIONS (fix för Azure SWA)
-app.MapMethods("{*path}", new[] { "OPTIONS" }, () => Results.Ok());
-
-// CORS
+// CORS — Stripe kräver att CORS ligger efter routing
 app.UseCors();
 
-// Auth
+// Auth — Clerk får inte läsa webhook-body före routing
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Controllers
+// Controllers — MVC ska hantera webhooken
 app.MapControllers();
+
+// OPTIONS wildcard — läggs sist så den inte stör webhooken
+app.MapMethods("{*path}", new[] { "OPTIONS" }, () => Results.Ok());
 
 app.Run();

@@ -72,7 +72,16 @@ public class PaymentsController : ControllerBase
         var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
         var signature = Request.Headers["Stripe-Signature"];
         var secret = _config["Stripe:WebhookSecret"];
-        Console.WriteLine(secret, signature);
+        Console.WriteLine("=== STRIPE DEBUG START ===");
+        Console.WriteLine("RAW PAYLOAD:");
+        Console.WriteLine(json);
+        Console.WriteLine("--------------------------");
+        Console.WriteLine("SIGNATURE HEADER:");
+        Console.WriteLine(signature);
+        Console.WriteLine("--------------------------");
+        Console.WriteLine("AZURE SECRET:");
+        Console.WriteLine(secret);
+        Console.WriteLine("=== STRIPE DEBUG END ===");
         Event stripeEvent;
 
         try
