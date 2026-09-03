@@ -75,9 +75,38 @@ public class PaymentsController : ControllerBase
     public async Task<IActionResult> StripeWebhook()
     {
         var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
-        var signature = Request.Headers["Stripe-Signature"];
+        var signature = Request.Headers["Stripe-Signature"].ToString();
         var secret = _config["Stripe:WebhookSecret"];
 
+        // === FILE LOGGING (WORKS ON FREE PLAN) ===
+        try
+        {
+            var logPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "stripe-log.txt");
+
+            var logText = $@"
+===========================
+=== STRIPE DEBUG LOG ===
+Time: {DateTime.UtcNow}
+Payload:
+{json}
+
+Signature Header:
+{signature}
+
+Secret:
+{secret}
+===========================
+";
+
+            System.IO.File.AppendAllText(logPath, logText);
+        }
+        catch (Exception fileEx)
+        {
+            // If file logging fails, at least return something
+            return BadRequest("File logging failed: " + fileEx.Message);
+        }
+
+        // === SIGNATURE VALIDATION ===
         Event stripeEvent;
 
         try
@@ -86,16 +115,23 @@ public class PaymentsController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Stripe signature validation failed");
+            // Log signature failure to file also
+            var logPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "stripe-log.txt");
+            System.IO.File.AppendAllText(logPath, $"\nSignature validation failed:\n{ex}\n");
+
             return BadRequest("Invalid Stripe signature");
         }
 
+        // === HANDLE CHECKOUT SESSION COMPLETED ===
         if (stripeEvent.Type == "checkout.session.completed")
         {
             var session = stripeEvent.Data.Object as Session;
             if (session == null)
             {
-                _logger.LogError("Stripe session object was null");
+                System.IO.File.AppendAllText(
+                    Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "stripe-log.txt"),
+                    "\nSession object was null\n"
+                );
                 return Ok();
             }
 
@@ -105,7 +141,10 @@ public class PaymentsController : ControllerBase
             var user = await _db.Users.FirstOrDefaultAsync(u => u.ClerkUserId == userId);
             if (user == null)
             {
-                _logger.LogWarning("Webhook received for non-existing user: {UserId}", userId);
+                System.IO.File.AppendAllText(
+                    Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "stripe-log.txt"),
+                    $"\nUser not found: {userId}\n"
+                );
                 return Ok();
             }
 
@@ -122,11 +161,15 @@ public class PaymentsController : ControllerBase
 
             await _db.SaveChangesAsync();
 
-            _logger.LogInformation("Deposit completed for user {UserId}, amount {Amount}", userId, amount);
+            System.IO.File.AppendAllText(
+                Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "stripe-log.txt"),
+                $"\nDeposit completed for {userId}, amount {amount}\n"
+            );
         }
 
         return Ok();
     }
+
 
     // ---------------------------------------------------------
     // 3. Withdraw
