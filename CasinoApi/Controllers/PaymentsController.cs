@@ -72,7 +72,7 @@ public class PaymentsController : ControllerBase
         var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
         var signature = Request.Headers["Stripe-Signature"];
         var secret = _config["Stripe:WebhookSecret"];
-
+        Console.WriteLine(secret, signature);
         Event stripeEvent;
 
         try
