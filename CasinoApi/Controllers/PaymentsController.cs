@@ -4,13 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Stripe;
 using Stripe.Checkout;
-using System.Security.Claims;
 
 namespace CasinoApi.Controllers;
 
 [ApiController]
 [Route("payments")]
-[Authorize] // Clerk auth aktiverad för alla endpoints
+[Authorize]
 public class PaymentsController : ControllerBase
 {
     private readonly CasinoDbContext _db;
@@ -33,7 +32,7 @@ public class PaymentsController : ControllerBase
     [HttpPost("create-checkout-session")]
     public IActionResult CreateCheckoutSession([FromBody] DepositRequest request)
     {
-        var userId = User.FindFirst("sub")?.Value; // Clerk user ID
+        var userId = User.FindFirst("sub")?.Value;
         if (userId == null)
             return Unauthorized("Missing Clerk user ID");
 
@@ -69,7 +68,7 @@ public class PaymentsController : ControllerBase
     }
 
     // ---------------------------------------------------------
-    // 2. Stripe Webhook (måste vara öppen)
+    // 2. Stripe Webhook
     // ---------------------------------------------------------
     [AllowAnonymous]
     [HttpPost("webhook")]
@@ -79,7 +78,6 @@ public class PaymentsController : ControllerBase
         var signature = Request.Headers["Stripe-Signature"].ToString();
         var secret = _config["Stripe:WebhookSecret"];
 
-        // ⭐ Azure App Service visar INTE Console.WriteLine → ILogger krävs
         _logger.LogInformation("=== STRIPE DEBUG START ===");
         _logger.LogInformation("RAW PAYLOAD: {Payload}", json);
         _logger.LogInformation("SIGNATURE HEADER: {Signature}", signature);
@@ -98,9 +96,14 @@ public class PaymentsController : ControllerBase
             return BadRequest("Invalid Stripe signature");
         }
 
-        if (stripeEvent.Type == Events.CheckoutSessionCompleted)
+        if (stripeEvent.Type == "checkout.session.completed")
         {
             var session = stripeEvent.Data.Object as Session;
+            if (session == null)
+            {
+                _logger.LogError("Stripe session object was null");
+                return Ok();
+            }
 
             var userId = session.ClientReferenceId;
             var amount = (decimal)(session.AmountTotal ?? 0) / 100m;
